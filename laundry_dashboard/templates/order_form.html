@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}สร้างออเดอร์ | ซักทีซะบ้อ{% endblock %}
+{% block crumb %}สร้างออเดอร์{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">NEW ORDER</div><h1>สร้างออเดอร์ใหม่</h1><p>สำหรับบันทึกออเดอร์หน้าร้านหรือใช้ทดสอบก่อนเชื่อม LINE</p></div><a class="btn btn-ghost" href="{{ url_for('orders') }}"><i data-lucide="arrow-left"></i> กลับรายการ</a></div>
+<form method="post" enctype="multipart/form-data" class="form-layout">
+ <div class="panel form-panel"><div class="form-section-title"><span class="section-icon"><i data-lucide="user-round"></i></span><div><h2>ข้อมูลลูกค้า</h2><p>ข้อมูลสำหรับเชื่อมโยงออเดอร์</p></div></div>
+  <div class="field-grid"><label class="field"><span>ชื่อลูกค้า <em>*</em></span><input name="customer_name" required placeholder="เช่น คุณสมชาย"></label><label class="field"><span>เบอร์โทรศัพท์</span><input name="phone" placeholder="08X-XXX-XXXX"></label><label class="field full"><span>LINE User ID <small>กรณีออเดอร์จาก LINE</small></span><input name="line_user_id" placeholder="จะเชื่อมจาก LINE ในขั้นตอนถัดไป"></label></div>
+ </div>
+ <div class="panel form-panel"><div class="form-section-title"><span class="section-icon"><i data-lucide="shirt"></i></span><div><h2>รายละเอียดบริการ</h2><p>เลือกบริการและผลิตภัณฑ์ตามความต้องการ</p></div></div>
+  <div class="field-grid"><label class="field full"><span>บริการ <em>*</em></span><select name="service" required>{% for key,label in services.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}</select><small class="hint">ซักและรีดรวมขั้นตอนการซักและการรีดไว้แล้ว</small></label>
+  <label class="field"><span>น้ำยาซักผ้า</span><select name="detergent"><option>ร้านจัดให้</option><option>นำมาเอง</option>{% for p in detergents %}<option>{{ p.name }}</option>{% endfor %}</select></label>
+  <label class="field"><span>น้ำยาปรับผ้านุ่ม</span><select name="softener"><option>ไม่ใช้</option><option>นำมาเอง</option>{% for p in softeners %}<option>{{ p.name }}</option>{% endfor %}</select></label>
+  <label class="field full"><span>รูปถุงผ้าหรือตะกร้า</span><input type="file" name="customer_photo" accept=".jpg,.jpeg,.png,.webp"><small class="hint">ใช้เป็นข้อมูลประกอบการรับผ้าเท่านั้น ระบบไม่ได้วิเคราะห์รูปภาพ</small></label>
+  <label class="field full"><span>หมายเหตุ</span><textarea name="notes" rows="3" placeholder="เช่น มีผ้าบอบบาง หรือแจ้งรายละเอียดเพิ่มเติม"></textarea></label></div>
+ </div>
+ <div class="form-actions"><a class="btn btn-ghost" href="{{ url_for('orders') }}">ยกเลิก</a><button class="btn btn-primary" type="submit"><i data-lucide="check"></i> บันทึกออเดอร์</button></div>
+</form>
+{% endblock %}

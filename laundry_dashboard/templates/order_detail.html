@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ order.order_code }} | ซักทีซะบ้อ{% endblock %}
+{% block crumb %}รายละเอียดออเดอร์{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ORDER DETAILS</div><h1>{{ order.order_code }}</h1><p>สร้างเมื่อ {{ order.created_at[:16].replace('T',' ') }} · ข้อมูลลูกค้าและการดำเนินงาน</p></div><div class="heading-actions"><a class="btn btn-ghost" href="{{ url_for('orders') }}"><i data-lucide="arrow-left"></i> กลับรายการ</a><span class="status status-{{ order.status }}">{{ statuses.get(order.status,order.status) }}</span></div></div>
+<div class="detail-grid">
+ <div class="detail-main">
+  <div class="panel form-panel"><div class="panel-head"><div><h2>ข้อมูลออเดอร์</h2><p>แก้ไขน้ำหนัก ราคา สถานะงาน และการชำระเงิน</p></div><span class="order-badge"><i data-lucide="clipboard-list"></i> {{ order.order_code }}</span></div>
+   <form method="post" action="{{ url_for('update_order',order_id=order.id) }}">
+    <div class="field-grid">
+      <label class="field"><span>ชื่อลูกค้า</span><input value="{{ order.customer_name }}" disabled></label>
+      <label class="field"><span>เบอร์โทรศัพท์</span><input value="{{ order.phone or '—' }}" disabled></label>
+      <label class="field"><span>บริการ</span><input value="{{ services.get(order.service,order.service) }}" disabled></label>
+      <label class="field"><span>LINE User ID</span><input value="{{ order.line_user_id or 'ยังไม่เชื่อม LINE' }}" disabled></label>
+      <label class="field"><span>น้ำหนักผ้า / ส่งราคาให้ลูกค้า</span><select name="weight" id="order-weight"><option value="">รอชั่งผ้า</option>{% for kg in range(1,7) %}<option value="{{ kg }}" {{ 'selected' if order.weight == kg else '' }}>{{ kg }} กก. — ฿{{ 80 + (kg - 1) * 60 }}</option>{% endfor %}{% if order.weight is not none and order.weight not in [1,2,3,4,5,6] %}<option value="{{ order.weight }}" selected>{{ order.weight }} กก. (รายการเดิม)</option>{% endif %}</select><small class="hint">ราคา: กก.แรก 80 บาท เพิ่มกิโลละ 60 บาท — บันทึกแล้วระบบจะส่งราคาและปุ่มเลือกชำระไป LINE</small></label>
+      <label class="field"><span>ราคาสุทธิ (บาท)</span><input type="number" min="0" step="0.01" name="price" id="order-price" value="{{ order.price if order.price is not none else '' }}" placeholder="คำนวณหลังเลือกน้ำหนัก" readonly></label>
+      <label class="field"><span>ช่องทางชำระเงิน</span><select name="payment_method"><option value="" {{ 'selected' if not order.payment_method else '' }}>ยังไม่เลือก</option><option value="cash" {{ 'selected' if order.payment_method=='cash' else '' }}>เงินสด</option><option value="promptpay" {{ 'selected' if order.payment_method=='promptpay' else '' }}>PromptPay</option></select><small class="hint">ออเดอร์หน้าร้านเลือกช่องทางได้ที่นี่ ส่วนออเดอร์ LINE ลูกค้าเลือกผ่านปุ่มในแชต</small></label>
+      <label class="field"><span>สถานะการชำระเงิน</span><select name="payment_status">{% for key,label in payments.items() %}<option value="{{ key }}" {{ 'selected' if order.payment_status==key else '' }}>{{ label }}</option>{% endfor %}</select><small class="hint">ยืนยัน “ชำระแล้ว” หลังตรวจสอบยอดเงินจริงเท่านั้น</small></label>
+      <label class="field full"><span>สถานะงานซักรีด</span><select name="status">{% for key,label in statuses.items() %}<option value="{{ key }}" {{ 'selected' if order.status==key else '' }}>{{ label }}</option>{% endfor %}</select><small class="hint">เลือกสถานะให้สอดคล้องกับบริการที่ลูกค้าเลือก</small></label>
+      <label class="field full"><span>หมายเหตุ / บันทึกการเปลี่ยนสถานะ</span><textarea name="notes" rows="3">{{ order.notes }}</textarea></label>
+      <label class="field full"><span>หมายเหตุในประวัติการเปลี่ยนสถานะ</span><input name="history_note" placeholder="เช่น ตรวจรับผ้าแล้ว หรือชำระเงินครบถ้วน"></label>
+    </div>
+    <div class="form-actions inside"><button class="btn btn-primary" type="submit"><i data-lucide="save"></i> บันทึกการเปลี่ยนแปลง</button></div>
+   </form>
+  </div>
+  <script>
+    (() => {
+      const weight = document.getElementById('order-weight');
+      const price = document.getElementById('order-price');
+      const prices = {1: 80, 2: 140, 3: 200, 4: 260, 5: 320, 6: 380};
+      weight.addEventListener('change', () => {
+        if (Object.prototype.hasOwnProperty.call(prices, weight.value)) price.value = prices[weight.value];
+        else if (!weight.value) price.value = '';
+      });
+    })();
+  </script>
+  <div class="panel form-panel"><div class="panel-head"><div><h2>รูปจากลูกค้า</h2><p>รูปถุงผ้าและสลิปที่ลูกค้าส่งเข้ามาทาง LINE</p></div></div><div class="image-preview-grid">
+   <div class="image-preview"><b>รูปถุงผ้า / ตะกร้า</b>{% if order.customer_photo %}<a href="{{ url_for('uploaded_file',filename=order.customer_photo) }}" target="_blank"><img src="{{ url_for('uploaded_file',filename=order.customer_photo) }}" alt="รูปถุงผ้า"></a>{% else %}<div class="no-image"><i data-lucide="image"></i><span>ยังไม่มีรูป</span></div>{% endif %}</div>
+   <div class="image-preview"><b>สลิปชำระเงิน</b>{% if order.payment_slip %}<a href="{{ url_for('uploaded_file',filename=order.payment_slip) }}" target="_blank"><img src="{{ url_for('uploaded_file',filename=order.payment_slip) }}" alt="สลิปชำระเงิน"></a>{% else %}<div class="no-image"><i data-lucide="receipt"></i><span>ยังไม่มีสลิป</span></div>{% endif %}</div>
+  </div></div>
+ </div>
+ <aside class="detail-side">
+  {% if not order.line_user_id %}<div class="panel form-panel"><h2>เชื่อมออเดอร์กับ LINE</h2>{% if link_code %}<p>ให้ลูกค้าพิมพ์ <b>ผูก {{ link_code.code }}</b> ในแชต LINE ก่อน {{ link_code.expires_at[:16].replace('T',' ') }} (รหัสใช้ได้ครั้งเดียว)</p>{% else %}<p>สร้างรหัสใช้ครั้งเดียว อายุ 15 นาที ให้ลูกค้าส่งใน LINE เพื่อรับการแจ้งสถานะ</p><form method="post" action="{{ url_for('create_line_link',order_id=order.id) }}"><button class="btn btn-secondary" type="submit">สร้างรหัสเชื่อม LINE</button></form>{% endif %}</div>{% else %}<div class="panel summary-card"><h2>เชื่อมต่อ LINE แล้ว</h2><p>{{ order.line_user_id }}</p></div>{% endif %}
+  <div class="panel summary-card"><h2>สรุปบริการ</h2><div class="summary-row"><span>บริการ</span><b>{{ services.get(order.service,order.service) }}</b></div><div class="summary-row"><span>น้ำยาซักผ้า</span><b>{{ order.detergent }}</b></div><div class="summary-row"><span>น้ำยาปรับผ้านุ่ม</span><b>{{ order.softener }}</b></div><div class="summary-row"><span>น้ำหนัก</span><b>{{ (order.weight|string + ' กก.') if order.weight is not none else 'รอชั่งผ้า' }}</b></div><div class="summary-total"><span>ราคาสุทธิ</span><strong>{{ order.price|money }}</strong></div><div class="summary-row"><span>ชำระเงิน</span><b>{{ payments.get(order.payment_status,order.payment_status) }}</b></div></div>
+  <div class="panel history-card"><h2><i data-lucide="history"></i> ประวัติสถานะ</h2>{% if history %}<div class="timeline">{% for h in history %}<div class="timeline-item"><span class="timeline-dot"></span><div><b>{{ statuses.get(h.new_status,h.new_status) }}</b>{% if h.note %}<p>{{ h.note }}</p>{% endif %}<small>{{ h.created_at[:16].replace('T',' ') }}</small></div></div>{% endfor %}</div>{% else %}<p class="muted">ยังไม่มีประวัติ</p>{% endif %}</div>
+  <div class="danger-zone"><form method="post" action="{{ url_for('delete_order',order_id=order.id) }}" onsubmit="return confirm('ยืนยันลบออเดอร์นี้หรือไม่?')"><button class="btn btn-danger btn-block" type="submit"><i data-lucide="trash-2"></i> ลบออเดอร์</button></form></div>
+ </aside>
+</div>
+{% endblock %}

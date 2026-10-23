@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}ภาพรวม | ซักทีซะบ้อ{% endblock %}
+{% block crumb %}ภาพรวม{% endblock %}
+{% block content %}
+<div class="page-heading">
+ <div><div class="eyebrow">MONDAY — LAUNDRY OVERVIEW</div><h1>สวัสดี, ผู้ดูแลร้าน <span class="wave">✦</span></h1><p>นี่คือภาพรวมการให้บริการและออเดอร์ของร้านในตอนนี้</p></div>
+ <a class="btn btn-primary" href="{{ url_for('new_order') }}"><i data-lucide="plus"></i> สร้างออเดอร์</a>
+</div>
+<div class="welcome-banner"><div class="banner-copy"><span class="banner-tag">BLUEWASH WORKSPACE</span><h2>จัดการงานซักรีดได้ง่ายขึ้น</h2><p>ติดตามออเดอร์ การชำระเงิน และสถานะบริการได้จากหน้าจอเดียว</p><a href="{{ url_for('orders') }}" class="banner-link">ดูออเดอร์ทั้งหมด <i data-lucide="arrow-up-right"></i></a></div><div class="banner-art"><div class="bubble bubble-one"></div><div class="bubble bubble-two"></div><div class="washer"><div class="washer-top"><span></span><span></span><span></span></div><div class="washer-door"><div class="door-shine"></div></div></div><div class="floating-spark">✦</div></div></div>
+<div class="section-head"><div><h2>ภาพรวมวันนี้</h2><p>ข้อมูลสรุปจากออเดอร์ในระบบ</p></div><span class="live-label"><span></span> อัปเดตจากฐานข้อมูล</span></div>
+<div class="stats-grid">
+ <div class="stat-card"><div class="stat-top"><span>ออเดอร์ทั้งหมด</span><span class="stat-icon blue"><i data-lucide="shopping-bag"></i></span></div><div class="stat-value">{{ total }}</div><div class="stat-note"><span class="note-blue">ทุกสถานะ</span> ในระบบ</div></div>
+ <div class="stat-card"><div class="stat-top"><span>รอดำเนินการ</span><span class="stat-icon amber"><i data-lucide="clock-3"></i></span></div><div class="stat-value">{{ waiting }}</div><div class="stat-note">รอตรวจรับหรือรอชำระเงิน</div></div>
+ <div class="stat-card"><div class="stat-top"><span>กำลังให้บริการ</span><span class="stat-icon violet"><i data-lucide="washing-machine"></i></span></div><div class="stat-value">{{ processing }}</div><div class="stat-note">อยู่ในขั้นตอนการซักรีด</div></div>
+ <div class="stat-card"><div class="stat-top"><span>พร้อมรับผ้า</span><span class="stat-icon green"><i data-lucide="package-check"></i></span></div><div class="stat-value">{{ ready }}</div><div class="stat-note">รอลูกค้ามารับที่ร้าน</div></div>
+</div>
+<div class="content-grid">
+ <section class="panel recent-panel">
+  <div class="panel-head"><div><h2>ออเดอร์ล่าสุด</h2><p>ติดตามรายการที่มีการอัปเดตล่าสุด</p></div><a class="text-link" href="{{ url_for('orders') }}">ดูทั้งหมด <i data-lucide="arrow-right"></i></a></div>
+  <div class="table-wrap"><table><thead><tr><th>รหัสออเดอร์</th><th>ลูกค้า</th><th>บริการ</th><th>สถานะ</th><th>ราคา</th><th></th></tr></thead><tbody>
+  {% for o in recent %}<tr><td><a class="order-code" href="{{ url_for('order_detail', order_id=o.id) }}">{{ o.order_code }}</a><small class="sub-cell">{{ o.created_at[:16].replace('T',' ') }}</small></td><td><div class="customer-cell"><span class="customer-avatar">{{ o.customer_name[:1] }}</span><b>{{ o.customer_name }}</b></div></td><td>{{ {'wash':'ซักอย่างเดียว','wash_dry':'ซักและอบแห้ง','wash_iron':'ซักและรีด'}.get(o.service,o.service) }}</td><td><span class="status status-{{ o.status }}">{{ statuses.get(o.status,o.status) }}</span></td><td class="price-cell">{{ o.price|money }}</td><td><a class="icon-link" href="{{ url_for('order_detail', order_id=o.id) }}"><i data-lucide="chevron-right"></i></a></td></tr>{% endfor %}
+  {% if not recent %}<tr><td colspan="6" class="empty-state">ยังไม่มีออเดอร์</td></tr>{% endif %}
+  </tbody></table></div>
+ </section>
+ <aside class="right-column">
+  <div class="panel revenue-card"><div class="panel-head"><div><h2>ยอดชำระที่ยืนยันแล้ว</h2><p>รวมออเดอร์ที่ชำระเงินแล้ว</p></div><span class="stat-icon green"><i data-lucide="wallet"></i></span></div><div class="revenue-value">{{ revenue|money }}</div><div class="revenue-foot"><span class="mini-check"><i data-lucide="check"></i></span> ยอดที่ยืนยันในระบบ</div></div>
+  <a class="panel payment-alert" href="{{ url_for('orders', payment='pending_verification') }}"><span class="alert-icon"><i data-lucide="receipt-text"></i></span><span class="alert-copy"><b>ตรวจสอบการชำระเงิน</b><small>มี {{ pending_payments }} รายการรอตรวจสอบสลิป</small></span><i data-lucide="chevron-right" class="alert-arrow"></i></a>
+  <div class="panel quick-panel"><h2>ทางลัด</h2><a href="{{ url_for('new_order') }}"><span class="quick-icon"><i data-lucide="plus-circle"></i></span><span><b>สร้างออเดอร์ใหม่</b><small>บันทึกข้อมูลลูกค้าและบริการ</small></span><i data-lucide="arrow-up-right"></i></a><a href="{{ url_for('products') }}"><span class="quick-icon"><i data-lucide="spray-can"></i></span><span><b>จัดการผลิตภัณฑ์</b><small>ตั้งค่าตัวเลือกน้ำยาที่ลูกค้าเห็น</small></span><i data-lucide="arrow-up-right"></i></a></div>
+ </aside>
+</div>
+{% endblock %}

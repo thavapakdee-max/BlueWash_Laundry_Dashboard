@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}ตัวเลือกผลิตภัณฑ์ | ซักทีซะบ้อ{% endblock %}
+{% block crumb %}ตัวเลือกผลิตภัณฑ์{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">PRODUCT OPTIONS</div><h1>ตัวเลือกผลิตภัณฑ์</h1><p>จัดการตัวเลือกน้ำยาที่จะแสดงให้ลูกค้าเลือกผ่าน LINE Chatbot</p></div></div>
+<div class="product-layout">
+ <section class="panel form-panel"><div class="form-section-title"><span class="section-icon"><i data-lucide="package-plus"></i></span><div><h2>เพิ่มตัวเลือกใหม่</h2><p>เลือกประเภทและตั้งชื่อให้ลูกค้าเข้าใจง่าย</p></div></div><form method="post"><div class="field-grid"><label class="field full"><span>ประเภทผลิตภัณฑ์</span><select name="category"><option value="detergent">น้ำยาซักผ้า</option><option value="softener">น้ำยาปรับผ้านุ่ม</option></select></label><label class="field full"><span>ชื่อ / กลิ่นผลิตภัณฑ์</span><input name="name" required placeholder="เช่น กลิ่นลาเวนเดอร์"></label></div><button class="btn btn-primary btn-block" type="submit"><i data-lucide="plus"></i> เพิ่มตัวเลือก</button></form><div class="info-box"><i data-lucide="info"></i><span>“นำมาเอง” และ “ไม่ใช้” เป็นตัวเลือกมาตรฐานในระบบ ไม่ต้องเพิ่มเป็นผลิตภัณฑ์</span></div></section>
+ <section class="panel form-panel"><div class="panel-head"><div><h2>รายการผลิตภัณฑ์</h2><p>เปิดหรือปิดตัวเลือกที่ต้องการให้ลูกค้าเห็น</p></div><span class="count-pill">{{ products|length }} รายการ</span></div>
+ <div class="product-list">{% for p in products %}<div class="product-row"><span class="product-icon {{ 'detergent' if p.category=='detergent' else 'softener' }}"><i data-lucide="{{ 'droplets' if p.category=='detergent' else 'flower-2' }}"></i></span><div class="product-info"><b>{{ p.name }}</b><small>{{ 'น้ำยาซักผ้า' if p.category=='detergent' else 'น้ำยาปรับผ้านุ่ม' }}</small></div><span class="status {{ 'status-ready' if p.active else 'status-cancelled' }}">{{ 'เปิดใช้งาน' if p.active else 'ปิดใช้งาน' }}</span><form method="post" action="{{ url_for('toggle_product',product_id=p.id) }}"><button class="btn btn-small {{ 'btn-secondary' if p.active else 'btn-primary' }}" type="submit">{{ 'ปิด' if p.active else 'เปิด' }}</button></form></div>{% endfor %}</div></section>
+</div>
+{% endblock %}

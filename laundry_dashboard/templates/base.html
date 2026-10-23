@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ซักทีซะบ้อ{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}">
+      <span class="brand-icon"><i data-lucide="waves"></i></span>
+      <span><b>ซักทีซะบ้อ</b><small>LAUNDRY MANAGEMENT</small></span>
+    </a>
+    <div class="side-label">เมนูหลัก</div>
+    <nav class="nav">
+      <a class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><i data-lucide="layout-dashboard"></i> ภาพรวม</a>
+      <a class="{{ 'active' if request.endpoint in ['orders','new_order','order_detail'] else '' }}" href="{{ url_for('orders') }}"><i data-lucide="clipboard-list"></i> จัดการออเดอร์ <span class="nav-dot"></span></a>
+      <a class="{{ 'active' if request.endpoint == 'products' else '' }}" href="{{ url_for('products') }}"><i data-lucide="package"></i> ตัวเลือกผลิตภัณฑ์</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="profile"><div class="avatar">BW</div><div><b>ผู้ดูแลร้าน</b><small>Admin</small></div><form method="post" action="{{ url_for('admin_logout') }}"><button class="logout-button" type="submit"><span class="logout-label">ออกจากระบบ</span><span class="logout-icon">↪</span></button></form></div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="brand-icon"><i data-lucide="waves"></i></span><b>ซักทีซะบ้อ</b></div>
+      <div class="crumb">ระบบจัดการร้าน <span>/</span> <strong>{% block crumb %}ภาพรวม{% endblock %}</strong></div>
+      <div class="top-actions"><span class="system-status"><span></span> ระบบพร้อมใช้งาน</span><div class="top-avatar">BW</div></div>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for category, message in messages %}<div class="flash {{ category }}"><i data-lucide="{{ 'check-circle-2' if category == 'success' else 'alert-circle' }}"></i>{{ message }}</div>{% endfor %}{% endif %}
+    {% endwith %}
+    <section class="page-content">{% block content %}{% endblock %}</section>
+    <footer class="footer">ซักทีซะบ้อ</footer>
+  </main>
+</div>
+<script>if(window.lucide){lucide.createIcons();}</script>
+{% block scripts %}{% endblock %}
+</body></html>

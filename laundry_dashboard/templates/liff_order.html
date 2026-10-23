@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f8ff">
+  <title>เริ่มใช้บริการซักผ้า | ซักทีซะบ้อ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='liff.css') }}">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <main class="liff-shell" data-liff-id="{{ liff_id }}">
+    <header class="hero">
+      <div class="brand-mark" aria-hidden="true">ซ</div>
+      <div><p class="eyebrow">LAUNDRY SERVICE</p><h1>ซักทีซะบ้อ</h1><p class="hero-copy">เลือกบริการที่ต้องการได้ในไม่กี่ขั้นตอน</p></div>
+    </header>
+
+    <div id="notice" class="notice" role="status">กำลังเชื่อมต่อกับ LINE…</div>
+    <form id="order-form" class="form" novalidate>
+      <section class="section">
+        <div class="section-title"><span>01</span><div><h2>เลือกบริการ</h2><p>เลือกได้ 1 รายการ</p></div></div>
+        <div id="services" class="service-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span>02</span><div><h2>น้ำยาซักผ้า</h2><p>เลือกผลิตภัณฑ์ที่ร้านมี หรือเลือกนำมาเอง</p></div></div>
+        <div id="detergents" class="choice-list"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span>03</span><div><h2>น้ำยาปรับผ้านุ่ม</h2><p>เลือกผลิตภัณฑ์ นำมาเอง หรือไม่ใช้</p></div></div>
+        <div id="softeners" class="choice-list"></div>
+      </section>
+
+      <section class="section photo-section">
+        <div class="section-title"><span>04</span><div><h2>รูปตะกร้าหรือถุงผ้า</h2><p>ใช้ประกอบการรับออเดอร์เท่านั้น ไม่วิเคราะห์ภาพ</p></div></div>
+        <label class="photo-picker" for="photo"><span class="camera-icon" aria-hidden="true">＋</span><span><b>เลือกรูปจากเครื่อง</b><small>JPG, PNG หรือ WEBP</small></span><input id="photo" name="customer_photo" type="file" accept="image/png,image/jpeg,image/webp" required></label>
+        <img id="photo-preview" class="photo-preview" alt="ตัวอย่างรูปผ้า" hidden>
+      </section>
+
+      <div class="reassurance"><span>✓</span><p>พนักงานจะตรวจผ้า ชั่งน้ำหนัก และแจ้งราคาจริงให้ทราบก่อนเริ่มซัก</p></div>
+      <button id="review-button" class="primary-button" type="button" disabled>ตรวจสอบรายการก่อนส่ง</button>
+      <p class="privacy-note">เมื่อยืนยัน ระบบจะสร้างออเดอร์และแจ้งพนักงานของร้าน</p>
+    </form>
+  </main>
+
+  <div id="review-modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <section class="review-card" role="dialog" aria-modal="true" aria-labelledby="review-title">
+      <button class="close-button" type="button" data-close aria-label="ปิด">×</button>
+      <p class="eyebrow">ตรวจสอบก่อนส่ง</p><h2 id="review-title">สรุปรายการซักผ้า</h2>
+      <dl id="review-list"></dl>
+      <p class="review-hint">พนักงานจะตรวจผ้า ชั่งน้ำหนัก และแจ้งราคาจริงผ่าน LINE หลังรับออเดอร์</p>
+      <div class="modal-actions"><button class="secondary-button" type="button" data-close>กลับไปแก้ไข</button><button id="submit-button" class="primary-button" type="button">ยืนยันส่งออเดอร์</button></div>
+    </section>
+  </div>
+
+  <div id="success-modal" class="modal" hidden>
+    <div class="modal-backdrop"></div>
+    <section class="review-card success-card" role="dialog" aria-modal="true" aria-labelledby="success-title">
+      <div class="success-mark">✓</div><p class="eyebrow">ส่งรายการแล้ว</p><h2 id="success-title">รับออเดอร์เรียบร้อย</h2>
+      <p id="success-copy" class="review-hint"></p>
+      <p class="review-hint">พนักงานจะตรวจผ้า ชั่งน้ำหนัก และแจ้งราคาในแชต LINE นี้</p>
+      <button id="done-button" class="primary-button" type="button">กลับไปที่แชต</button>
+    </section>
+  </div>
+  <script src="{{ url_for('static', filename='liff.js') }}"></script>
+</body>
+</html>
